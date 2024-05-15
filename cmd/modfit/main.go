@@ -19,7 +19,7 @@ func main() {
 			printTopLevelHelp()
 		case "help":
 			if len(os.Args) == 2 {
-				printTopLevelHelp()
+				fmt.Fprintln(os.Stderr, printTopLevelHelp())
 				os.Exit(1)
 			}
 
@@ -34,7 +34,7 @@ func main() {
 				))
 			}
 
-			fmt.Fprintln(os.Stderr, subCmd.UsageStr())
+			fmt.Fprintln(os.Stderr, command.FmtHelp(subCmd, ""))
 			os.Exit(1)
 		default: {
 			subCmd, cmdFound := domainCmds()[os.Args[1]]
@@ -62,7 +62,7 @@ func domainCmds() map[string]command.Domain {
 }
 
 // TODO: clarify domain/object/command terminology
-func printTopLevelHelp() {
+func printTopLevelHelp() string {
 	var outputBuf bytes.Buffer
 
 	topHelpHeader :=
@@ -80,7 +80,10 @@ func printTopLevelHelp() {
 
 	nameSize := 0
 	for _, domain := range domains {
-		nameSize = len([]rune(domain.Name()))
+		curSize := len([]rune(domain.Name()))
+		if curSize > nameSize {
+			nameSize = curSize
+		}
 	}
 	nameSize++
 	fmtString := fmt.Sprintf("  %%-%ds %%s\n", nameSize)
@@ -90,10 +93,9 @@ func printTopLevelHelp() {
 	}
 
 	fmt.Fprint(&outputBuf, "\nSee help about any object by running \"modfit help [object]\".")
-	fmt.Fprint(&outputBuf, "\n\nCommon options:\n")
-
-	fmt.Fprintln(os.Stderr, &outputBuf)
+	fmt.Fprint(&outputBuf, "\n\nCOMMON OPTIONS:\n")
 	flags := command.InitBaseFlags(new(command.BaseArgs))
-	flags.PrintDefaults()
-	os.Exit(1)
+	fmt.Fprint(&outputBuf, flags.FlagUsages())
+
+	return outputBuf.String()
 }

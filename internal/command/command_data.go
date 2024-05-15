@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"modfit/internal/platform"
@@ -15,7 +16,6 @@ type cmdData interface {
 	Name() string
 	ShortDescr() string
 	Run(cxt context.Context, args []string)
-	UsageStr() string
 }
 
 type Domain interface {
@@ -25,6 +25,7 @@ type Domain interface {
 
 type Action interface {
 	cmdData
+	UsageStr() string
 }
 
 func MapNames[C cmdData](cmds []C) map[string]C {
@@ -42,7 +43,7 @@ func CallDomainAction[D Domain](ctxt context.Context, domain D, args []string) {
 
 	if args[0] == "help" {
 		if len(args) == 1 {
-			fmt.Fprintln(os.Stderr, domain.UsageStr())
+			fmt.Fprintln(os.Stderr, FmtHelp(domain, ""))
 			os.Exit(1)
 		}
 		cmd, cmdFound := domain.ActionCmds()[args[1]]
@@ -67,11 +68,6 @@ func CallDomainAction[D Domain](ctxt context.Context, domain D, args []string) {
 	action.Run(context.TODO(), args[1:])
 }
 
-func PrintDomainHelp[D Domain](ctxt context.Context, domain D, cmdName string) {
-	cmd := domain.ActionCmds()[cmdName]
-	fmt.Fprintln(os.Stderr, cmd.UsageStr())
-}
-
 type BaseArgs struct {
 	ConfigPath string
 	LogPath string
@@ -92,5 +88,49 @@ func (args *BaseArgs) ApplyToConfig(cfg *platform.Config) {
 	if args.Verbose {
 		cfg.Verbosity = platform.Verbose
 	}
+}
+
+func FmtHelp(d Domain, actionName string) string {
+	if len(actionName) == 0 {
+		return fmtDomainHelp(d)
+	}
+
+	action, cmdFound := d.ActionCmds()[actionName]
+	if !cmdFound {
+		platform.FailOut(fmt.Sprintf(
+			"Expected a valid action, but was given \"%s\"",
+			actionName,
+		))
+	}
+
+	return action.UsageStr()
+}
+
+func fmtDomainHelp(d Domain) string {
+	var outputBuf bytes.Buffer
+
+	fmt.Fprintf(&outputBuf, "OBJECT: %s\n", d.Name())
+	fmt.Fprintf(&outputBuf, "%s\n\n", d.ShortDescr())
+	fmt.Fprintf(&outputBuf, "Usage: modfit %s [COMMAND]\n\n", d.Name())
+	fmt.Fprintf(&outputBuf, "COMMANDS:\n")
+
+	cmds := d.ActionCmds()
+
+	nameSize := 0
+	for _, cmd := range cmds {
+		curSize := len([]rune(cmd.Name()))
+		if curSize > nameSize {
+			nameSize = curSize
+		}
+	}
+	nameSize++
+
+	fmtString := fmt.Sprintf("  %%-%ds %%s\n", nameSize)
+	for _, cmd := range cmds {
+		fmt.Fprintf(&outputBuf, fmtString, cmd.Name(), cmd.ShortDescr())
+	}
+	fmt.Fprintf(&outputBuf, "\nSee help about any command by running \"modfit %s help [command]\".", d.Name())
+
+	return outputBuf.String()
 }
 

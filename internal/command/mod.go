@@ -16,10 +16,6 @@ func (cmd ModDomain) ShortDescr() string {
 	return "user modification to a game"
 }
 
-func (cmd ModDomain) UsageStr() string {
-	return "PLACEHOLDER usage for [mod]"
-}
-
 func (cmd ModDomain) ActionCmds() map[string]Action {
 	return MapNames([]Action{
 		new(ModIngestAction),

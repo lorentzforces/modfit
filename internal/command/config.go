@@ -31,10 +31,6 @@ func (cmd ConfigDomain) Run(cxt context.Context, args []string) {
 	CallDomainAction(cxt, cmd, args)
 }
 
-func (cmd ConfigDomain) UsageStr() string {
-	return "PLACEHOLDER usage for [config]"
-}
-
 type ConfigGenerateAction struct{}
 
 func (cmd ConfigGenerateAction) Name() string {
