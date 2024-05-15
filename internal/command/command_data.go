@@ -111,8 +111,8 @@ func fmtObjectHelp(o ObjectCmd) string {
 
 	fmt.Fprintf(&outputBuf, "OBJECT: %s\n", o.Name())
 	fmt.Fprintf(&outputBuf, "%s\n\n", o.ShortDescr())
-	fmt.Fprintf(&outputBuf, "Usage: modfit %s [COMMAND]\n\n", o.Name())
-	fmt.Fprintf(&outputBuf, "COMMANDS:\n")
+	fmt.Fprintf(&outputBuf, "Usage: modfit %s [ACTION]\n\n", o.Name())
+	fmt.Fprintf(&outputBuf, "ACTIONS:\n")
 
 	cmds := o.ActionCmds()
 
@@ -129,7 +129,7 @@ func fmtObjectHelp(o ObjectCmd) string {
 	for _, cmd := range cmds {
 		fmt.Fprintf(&outputBuf, fmtString, cmd.Name(), cmd.ShortDescr())
 	}
-	fmt.Fprintf(&outputBuf, "\nSee help about any command by running \"modfit %s help [command]\".", o.Name())
+	fmt.Fprintf(&outputBuf, "\nSee help about any action by running \"modfit %s help [action]\".", o.Name())
 
 	return outputBuf.String()
 }
