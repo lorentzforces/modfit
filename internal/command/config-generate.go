@@ -19,7 +19,7 @@ func (cmd ConfigGenerateAction) ShortDescr() string {
 	return "Generate a modfit config file"
 }
 
-func (cmd ConfigGenerateAction) UsageStr() string {
+func (cmd ConfigGenerateAction) usageStr() string {
 	return "PLACEHOLDER usage for [config generate]"
 }
 

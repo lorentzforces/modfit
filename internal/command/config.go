@@ -14,13 +14,13 @@ func (cmd ConfigObject) ShortDescr() string {
 	return "persistent settings to customize modfit behavior"
 }
 
-func (cmd ConfigObject) ActionCmds() map[string]ActionCmd {
-	return MapNames([]ActionCmd{
+func (cmd ConfigObject) actionCmds() map[string]actionCmd {
+	return MapNames([]actionCmd{
 		new(ConfigGenerateAction),
 		new(ConfigResolvePathAction),
 	})
 }
 
 func (cmd ConfigObject) Run(cxt context.Context, args []string) {
-	CallObjectAction(cxt, cmd, args)
+	callObjectAction(cxt, cmd, args)
 }

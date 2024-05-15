@@ -16,7 +16,7 @@ func (cmd ModIngestAction) ShortDescr() string {
 	return "Add a game mod to modfit's database from existing files"
 }
 
-func (cmd ModIngestAction) UsageStr() string {
+func (cmd ModIngestAction) usageStr() string {
 	return "PLACEHOLDER usage for [mod ingest]"
 }
 
@@ -30,7 +30,7 @@ func (cmd ModIngestAction) Run(ctx context.Context, args []string) {
 	baseFlags.Parse(args)
 
 	config := platform.ParseConfig(parsedArgs.ConfigPath)
-	parsedArgs.ApplyToConfig(&config)
+	parsedArgs.applyToConfig(&config)
 
 	fmt.Printf("--DEBUG-- parsed config values: %+v\n", config)
 

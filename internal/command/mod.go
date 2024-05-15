@@ -14,13 +14,13 @@ func (cmd ModObject) ShortDescr() string {
 	return "user modification to a game"
 }
 
-func (cmd ModObject) ActionCmds() map[string]ActionCmd {
-	return MapNames([]ActionCmd{
+func (cmd ModObject) actionCmds() map[string]actionCmd {
+	return MapNames([]actionCmd{
 		new(ModIngestAction),
 	})
 }
 
 func (cmd ModObject) Run(cxt context.Context, args []string) {
-	CallObjectAction(cxt, cmd, args)
+	callObjectAction(cxt, cmd, args)
 }
 

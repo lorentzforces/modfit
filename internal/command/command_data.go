@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// TODO: quick audit exported members, a lot can probably be unexported
-
 type cmdData interface {
 	Name() string
 	ShortDescr() string
@@ -20,12 +18,12 @@ type cmdData interface {
 
 type ObjectCmd interface {
 	cmdData
-	ActionCmds() map[string]ActionCmd
+	actionCmds() map[string]actionCmd
 }
 
-type ActionCmd interface {
+type actionCmd interface {
 	cmdData
-	UsageStr() string
+	usageStr() string
 }
 
 func MapNames[C cmdData](cmds []C) map[string]C {
@@ -36,7 +34,7 @@ func MapNames[C cmdData](cmds []C) map[string]C {
 	return cmdMap
 }
 
-func CallObjectAction[O ObjectCmd](ctxt context.Context, object O, args []string) {
+func callObjectAction[O ObjectCmd](ctxt context.Context, object O, args []string) {
 	if len(args) < 1 {
 		platform.FailOut("Must specify an action")
 	}
@@ -46,18 +44,18 @@ func CallObjectAction[O ObjectCmd](ctxt context.Context, object O, args []string
 			fmt.Fprintln(os.Stderr, FmtHelp(object, ""))
 			os.Exit(1)
 		}
-		cmd, cmdFound := object.ActionCmds()[args[1]]
+		cmd, cmdFound := object.actionCmds()[args[1]]
 		if !cmdFound {
 			platform.FailOut(fmt.Sprintf(
 				"Expected a valid action, but was given \"%s\"",
 				args[1],
 			))
 		}
-		fmt.Fprintln(os.Stderr, cmd.UsageStr())
+		fmt.Fprintln(os.Stderr, cmd.usageStr())
 		os.Exit(1)
 	}
 
-	action, cmdFound := object.ActionCmds()[args[0]]
+	action, cmdFound := object.actionCmds()[args[0]]
 	if !cmdFound {
 		platform.FailOut(fmt.Sprintf(
 			"Expected a valid action, but was given \"%s\"",
@@ -81,7 +79,7 @@ func InitBaseFlags(argData *BaseArgs) *pflag.FlagSet {
 	return flags
 }
 
-func (args *BaseArgs) ApplyToConfig(cfg *platform.Config) {
+func (args *BaseArgs) applyToConfig(cfg *platform.Config) {
 	if len(args.LogPath) > 0 {
 		cfg.LogPath = args.LogPath
 	}
@@ -95,7 +93,7 @@ func FmtHelp(o ObjectCmd, actionName string) string {
 		return fmtObjectHelp(o)
 	}
 
-	action, cmdFound := o.ActionCmds()[actionName]
+	action, cmdFound := o.actionCmds()[actionName]
 	if !cmdFound {
 		platform.FailOut(fmt.Sprintf(
 			"Expected a valid action, but was given \"%s\"",
@@ -103,7 +101,7 @@ func FmtHelp(o ObjectCmd, actionName string) string {
 		))
 	}
 
-	return action.UsageStr()
+	return action.usageStr()
 }
 
 func fmtObjectHelp(o ObjectCmd) string {
@@ -114,7 +112,7 @@ func fmtObjectHelp(o ObjectCmd) string {
 	fmt.Fprintf(&outputBuf, "Usage: modfit %s [ACTION]\n\n", o.Name())
 	fmt.Fprintf(&outputBuf, "ACTIONS:\n")
 
-	cmds := o.ActionCmds()
+	cmds := o.actionCmds()
 
 	nameSize := 0
 	for _, cmd := range cmds {
@@ -133,4 +131,3 @@ func fmtObjectHelp(o ObjectCmd) string {
 
 	return outputBuf.String()
 }
-

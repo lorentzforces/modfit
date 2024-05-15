@@ -18,7 +18,7 @@ func (cmd ConfigResolvePathAction) ShortDescr() string {
 	return "Get the path which modfit will attempt to resolve a config file at"
 }
 
-func (cmd ConfigResolvePathAction) UsageStr() string {
+func (cmd ConfigResolvePathAction) usageStr() string {
 	return "PLACEHOLDER usage for [config resolve-path]"
 }
 

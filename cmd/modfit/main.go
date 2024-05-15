@@ -64,7 +64,6 @@ func objectCmds() map[string]command.ObjectCmd {
 	})
 }
 
-// TODO: clarify domain/object/command terminology
 func printTopLevelHelp() string {
 	var outputBuf bytes.Buffer
 
