@@ -1,6 +1,6 @@
 module modfit
 
-go 1.21.8
+go 1.22
 
 require (
 	github.com/BurntSushi/toml v1.3.2
