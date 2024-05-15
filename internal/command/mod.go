@@ -4,23 +4,23 @@ import (
 	"context"
 )
 
-type ModDomain struct{}
+type ModObject struct{}
 
-func (cmd ModDomain) Name() string {
+func (cmd ModObject) Name() string {
 	return "mod"
 }
 
-func (cmd ModDomain) ShortDescr() string {
+func (cmd ModObject) ShortDescr() string {
 	return "user modification to a game"
 }
 
-func (cmd ModDomain) ActionCmds() map[string]Action {
-	return MapNames([]Action{
+func (cmd ModObject) ActionCmds() map[string]ActionCmd {
+	return MapNames([]ActionCmd{
 		new(ModIngestAction),
 	})
 }
 
-func (cmd ModDomain) Run(cxt context.Context, args []string) {
-	CallDomainAction(cxt, cmd, args)
+func (cmd ModObject) Run(cxt context.Context, args []string) {
+	CallObjectAction(cxt, cmd, args)
 }
 

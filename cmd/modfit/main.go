@@ -11,7 +11,10 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		platform.FailOut("Must specify a valid subcommand")
+		failMsg :=
+			"Must specify a valid object.\n" +
+			"Run \"modfit help\" to see valid objects and usage information."
+		platform.FailOut(failMsg)
 	}
 
 	switch os.Args[1] {
@@ -23,41 +26,41 @@ func main() {
 				os.Exit(1)
 			}
 
-			subCmd, cmdFound := domainCmds()[os.Args[2]]
+			objectCmd, cmdFound := objectCmds()[os.Args[2]]
 			if !cmdFound {
 				failMsg :=
 					"Expected a valid modfit object, but was given \"%s\"\n" +
-					"Run \"modfit --help\" to see valid objects and usage information."
+					"Run \"modfit help\" to see valid objects and usage information."
 				platform.FailOut(fmt.Sprintf(
 					failMsg,
 					os.Args[2],
 				))
 			}
 
-			fmt.Fprintln(os.Stderr, command.FmtHelp(subCmd, ""))
+			fmt.Fprintln(os.Stderr, command.FmtHelp(objectCmd, ""))
 			os.Exit(1)
 		default: {
-			subCmd, cmdFound := domainCmds()[os.Args[1]]
+			objectCmd, cmdFound := objectCmds()[os.Args[1]]
 
 			if !cmdFound {
 				failMsg :=
 					"Expected a valid modfit object, but was given \"%s\"\n" +
-					"Run \"modfit --help\" to see valid objects and usage information."
+					"Run \"modfit help\" to see valid objects and usage information."
 				platform.FailOut(fmt.Sprintf(
 					failMsg,
 					os.Args[1],
 				))
 			}
 
-			subCmd.Run(context.TODO(), os.Args[2:])
+			objectCmd.Run(context.TODO(), os.Args[2:])
 		}
 	}
 }
 
-func domainCmds() map[string]command.Domain {
-	return command.MapNames([]command.Domain{
-		new(command.ModDomain),
-		new(command.ConfigDomain),
+func objectCmds() map[string]command.ObjectCmd {
+	return command.MapNames([]command.ObjectCmd{
+		new(command.ModObject),
+		new(command.ConfigObject),
 	})
 }
 
@@ -67,20 +70,20 @@ func printTopLevelHelp() string {
 
 	topHelpHeader :=
 		"Modfit is a command-line mod manager.\n" +
-		"Commands are collected under the domain objects they operate on, so a command takes " +
+		"Actions are collected under the domain objects they operate on, so a command takes " +
 		"the form: \n" +
-		"      modfit [OBJECT] [COMMAND]\n" +
+		"      modfit [OBJECT] [ACTION]\n" +
 		"\n" +
 		"You can see this message by running \"modfit help\".\n" +
 		"\n" +
 		"OBJECTS IN MODFIT:\n"
 	fmt.Fprint(&outputBuf, topHelpHeader)
 
-	domains := domainCmds()
+	objects := objectCmds()
 
 	nameSize := 0
-	for _, domain := range domains {
-		curSize := len([]rune(domain.Name()))
+	for _, object := range objects {
+		curSize := len([]rune(object.Name()))
 		if curSize > nameSize {
 			nameSize = curSize
 		}
@@ -88,8 +91,8 @@ func printTopLevelHelp() string {
 	nameSize++
 	fmtString := fmt.Sprintf("  %%-%ds %%s\n", nameSize)
 
-	for _, domain := range domains {
-		fmt.Fprintf(&outputBuf, fmtString, domain.Name(), domain.ShortDescr())
+	for _, object := range objects {
+		fmt.Fprintf(&outputBuf, fmtString, object.Name(), object.ShortDescr())
 	}
 
 	fmt.Fprint(&outputBuf, "\nSee help about any object by running \"modfit help [object]\".")

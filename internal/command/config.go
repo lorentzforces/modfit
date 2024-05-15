@@ -4,23 +4,23 @@ import (
 	"context"
 )
 
-type ConfigDomain struct{}
+type ConfigObject struct{}
 
-func (cmd ConfigDomain) Name() string {
+func (cmd ConfigObject) Name() string {
 	return "config"
 }
 
-func (cmd ConfigDomain) ShortDescr() string {
+func (cmd ConfigObject) ShortDescr() string {
 	return "persistent settings to customize modfit behavior"
 }
 
-func (cmd ConfigDomain) ActionCmds() map[string]Action {
-	return MapNames([]Action{
+func (cmd ConfigObject) ActionCmds() map[string]ActionCmd {
+	return MapNames([]ActionCmd{
 		new(ConfigGenerateAction),
 		new(ConfigResolvePathAction),
 	})
 }
 
-func (cmd ConfigDomain) Run(cxt context.Context, args []string) {
-	CallDomainAction(cxt, cmd, args)
+func (cmd ConfigObject) Run(cxt context.Context, args []string) {
+	CallObjectAction(cxt, cmd, args)
 }

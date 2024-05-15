@@ -18,12 +18,12 @@ type cmdData interface {
 	Run(cxt context.Context, args []string)
 }
 
-type Domain interface {
+type ObjectCmd interface {
 	cmdData
-	ActionCmds() map[string]Action
+	ActionCmds() map[string]ActionCmd
 }
 
-type Action interface {
+type ActionCmd interface {
 	cmdData
 	UsageStr() string
 }
@@ -36,17 +36,17 @@ func MapNames[C cmdData](cmds []C) map[string]C {
 	return cmdMap
 }
 
-func CallDomainAction[D Domain](ctxt context.Context, domain D, args []string) {
+func CallObjectAction[O ObjectCmd](ctxt context.Context, object O, args []string) {
 	if len(args) < 1 {
 		platform.FailOut("Must specify an action")
 	}
 
 	if args[0] == "help" {
 		if len(args) == 1 {
-			fmt.Fprintln(os.Stderr, FmtHelp(domain, ""))
+			fmt.Fprintln(os.Stderr, FmtHelp(object, ""))
 			os.Exit(1)
 		}
-		cmd, cmdFound := domain.ActionCmds()[args[1]]
+		cmd, cmdFound := object.ActionCmds()[args[1]]
 		if !cmdFound {
 			platform.FailOut(fmt.Sprintf(
 				"Expected a valid action, but was given \"%s\"",
@@ -57,7 +57,7 @@ func CallDomainAction[D Domain](ctxt context.Context, domain D, args []string) {
 		os.Exit(1)
 	}
 
-	action, cmdFound := domain.ActionCmds()[args[0]]
+	action, cmdFound := object.ActionCmds()[args[0]]
 	if !cmdFound {
 		platform.FailOut(fmt.Sprintf(
 			"Expected a valid action, but was given \"%s\"",
@@ -90,12 +90,12 @@ func (args *BaseArgs) ApplyToConfig(cfg *platform.Config) {
 	}
 }
 
-func FmtHelp(d Domain, actionName string) string {
+func FmtHelp(o ObjectCmd, actionName string) string {
 	if len(actionName) == 0 {
-		return fmtDomainHelp(d)
+		return fmtObjectHelp(o)
 	}
 
-	action, cmdFound := d.ActionCmds()[actionName]
+	action, cmdFound := o.ActionCmds()[actionName]
 	if !cmdFound {
 		platform.FailOut(fmt.Sprintf(
 			"Expected a valid action, but was given \"%s\"",
@@ -106,15 +106,15 @@ func FmtHelp(d Domain, actionName string) string {
 	return action.UsageStr()
 }
 
-func fmtDomainHelp(d Domain) string {
+func fmtObjectHelp(o ObjectCmd) string {
 	var outputBuf bytes.Buffer
 
-	fmt.Fprintf(&outputBuf, "OBJECT: %s\n", d.Name())
-	fmt.Fprintf(&outputBuf, "%s\n\n", d.ShortDescr())
-	fmt.Fprintf(&outputBuf, "Usage: modfit %s [COMMAND]\n\n", d.Name())
+	fmt.Fprintf(&outputBuf, "OBJECT: %s\n", o.Name())
+	fmt.Fprintf(&outputBuf, "%s\n\n", o.ShortDescr())
+	fmt.Fprintf(&outputBuf, "Usage: modfit %s [COMMAND]\n\n", o.Name())
 	fmt.Fprintf(&outputBuf, "COMMANDS:\n")
 
-	cmds := d.ActionCmds()
+	cmds := o.ActionCmds()
 
 	nameSize := 0
 	for _, cmd := range cmds {
@@ -129,7 +129,7 @@ func fmtDomainHelp(d Domain) string {
 	for _, cmd := range cmds {
 		fmt.Fprintf(&outputBuf, fmtString, cmd.Name(), cmd.ShortDescr())
 	}
-	fmt.Fprintf(&outputBuf, "\nSee help about any command by running \"modfit %s help [command]\".", d.Name())
+	fmt.Fprintf(&outputBuf, "\nSee help about any command by running \"modfit %s help [command]\".", o.Name())
 
 	return outputBuf.String()
 }
