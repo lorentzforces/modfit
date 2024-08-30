@@ -1,9 +1,5 @@
 package command
 
-import (
-	"context"
-)
-
 type ModObject struct{}
 
 func (cmd ModObject) Name() string {
@@ -20,7 +16,7 @@ func (cmd ModObject) actionCmds() map[string]actionCmd {
 	})
 }
 
-func (cmd ModObject) Run(cxt context.Context, args []string) {
-	callObjectAction(cxt, cmd, args)
+func (cmd ModObject) Run(args []string) {
+	callObjectAction(cmd, args)
 }
 

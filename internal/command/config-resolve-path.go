@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"fmt"
 	"modfit/internal/platform"
 	"os"
@@ -26,7 +25,7 @@ type ConfigResolvePathArgs struct {
 	BaseArgs
 }
 
-func (cmd ConfigResolvePathAction) Run(cts context.Context, args []string) {
+func (cmd ConfigResolvePathAction) Run(args []string) {
 	parsedArgs := new(ConfigResolvePathArgs)
 	baseFlags := InitBaseFlags(&parsedArgs.BaseArgs)
 	baseFlags.Parse(args)

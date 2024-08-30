@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"fmt"
 	"modfit/internal/platform"
 )
@@ -24,7 +23,7 @@ type modIngestArgs struct {
 	BaseArgs
 }
 
-func (cmd ModIngestAction) Run(ctx context.Context, args []string) {
+func (cmd ModIngestAction) Run(args []string) {
 	parsedArgs := new(modIngestArgs)
 	baseFlags := InitBaseFlags(&parsedArgs.BaseArgs)
 	baseFlags.Parse(args)

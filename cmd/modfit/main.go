@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"modfit/internal/command"
 	"modfit/internal/platform"
@@ -52,7 +51,7 @@ func main() {
 				))
 			}
 
-			objectCmd.Run(context.TODO(), os.Args[2:])
+			objectCmd.Run(os.Args[2:])
 		}
 	}
 }

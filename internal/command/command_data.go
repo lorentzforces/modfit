@@ -2,7 +2,6 @@ package command
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"modfit/internal/platform"
 	"os"
@@ -13,7 +12,7 @@ import (
 type cmdData interface {
 	Name() string
 	ShortDescr() string
-	Run(cxt context.Context, args []string)
+	Run(args []string)
 }
 
 type ObjectCmd interface {
@@ -34,7 +33,7 @@ func MapNames[C cmdData](cmds []C) map[string]C {
 	return cmdMap
 }
 
-func callObjectAction[O ObjectCmd](ctxt context.Context, object O, args []string) {
+func callObjectAction(object ObjectCmd, args []string) {
 	if len(args) < 1 {
 		platform.FailOut("Must specify an action")
 	}
@@ -63,7 +62,7 @@ func callObjectAction[O ObjectCmd](ctxt context.Context, object O, args []string
 		))
 	}
 
-	action.Run(context.TODO(), args[1:])
+	action.Run(args[1:])
 }
 
 type BaseArgs struct {

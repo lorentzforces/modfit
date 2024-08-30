@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"fmt"
 	"modfit/internal/platform"
 	"os"
@@ -27,7 +26,7 @@ type ConfigGenerateArgs struct {
 	BaseArgs
 }
 
-func (cmd ConfigGenerateAction) Run(ctx context.Context, args []string) {
+func (cmd ConfigGenerateAction) Run(args []string) {
 	parsedArgs := new(ConfigGenerateArgs)
 	baseFlags := InitBaseFlags(&parsedArgs.BaseArgs)
 	baseFlags.Parse(args)
